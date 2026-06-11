@@ -1,84 +1,122 @@
-#include "apc.h"
+/*
+Name : Ajay Desai
+Roll No : 25031_105
+Date : 20/04/2026
+Description : ***** Arbitrary Precision Calculator *****
+
+          -> This project is an Arbitrary Precision Calculator designed to perform mathematical operations on numbers of virtually
+                 unlimited size.
+          -> Unlike standard calculators that are restricted by fixed data types, this APC can handle very large integers and high-
+                 precision decimal values without loss of accuracy.
+          -> It supports operations such as addition, subtraction, multiplication and division on big numbers.
+          -> It also allows users to input extremely large numeric values and view the computed results with complete precision.
+          -> The APC ensures accurate calculations even for numbers that exceed the limits of built-in data types, making it useful
+                 for scientific computing, cryptography, and mathematical research.
+*/
+
+#include "header.h"
+
+int negative;
+
+int sign1 = 1, sign2 = 1;
 
 int main(int argc, char *argv[])
 {
+    /* Declare the pointers */
+    Dlist *head1 = NULL, *tail1 = NULL, *head2 = NULL, *tail2 = NULL, *headR = NULL, *tailR = NULL;
+    char option, operator;
+    char ch;
 
-    if (argc != 4)
+    do
     {
-        printf("Arguments count shoud be exactly four");
-        return FAILURE;
-    }
-
-    int i = 0;
-    for (int i = 0; argv[1][i] != '\0'; i++)
-    {
-        if (!isdigit(argv[1][i]))
+        /* Code for reading the inputs */
+        if (argc != 4)
         {
-            printf("First number should contain only digits\n");
-            return FAILURE;
+            printf("Usage: ./a.out <num1> <operator> <num2>\n");
+            return 0;
         }
-    }
+        operator = argv[2][0];
 
-    for (int i = 0; argv[3][i] != '\0'; i++)
-    {
-        if (!isdigit(argv[3][i]))
+        if (read_and_validate(argv) == FAILURE)
         {
-            printf("Second number should contain only digits\n");
-            return FAILURE;
+            printf("Read and validation failed!!!\n");
+            return 0;
         }
-    }
 
-    if (argv[2][0] != '+' && argv[2][0] != '-' && argv[2][0] != '*' && argv[2][0] != '/')
-    {
-        printf("Invalid operator. Use +, -, *, or /\n");
-        return FAILURE;
-    }
+        // inserting elements in LINKED LIST.
+        insert_element(&head1, &tail1, argv[1], &sign1);
+        insert_element(&head2, &tail2, argv[3], &sign2);
 
-    printf("First number: %s\n", argv[1]);
-    printf("Operator: %c\n", argv[2][0]);
-    printf("Second number: %s\n", argv[3]);
+        operation_validation(&operator, &head1, &head2);
+        /* Function for extracting the operator */
+        switch (operator)
+        {
+        case '+':
+            /* call the function to perform the addition operation */
+            if ((addition(&head1, &tail1, &head2, &tail2, &headR, &tailR)) == FAILURE)
+            {
+                printf("Addition operation fail\n");
+            }
+            else
+            {
+                printf("Addition Successful.\n");
+                Print_list_element(headR);
+            }
+            break;
+        case '-':
+            /* call the function to perform the subtraction operation */
+            if ((subtraction(&head1, &tail1, &head2, &tail2, &headR, &tailR)) == FAILURE)
+            {
+                printf("subtraction operation fail\n");
+            }
+            else
+            {
+                printf("subtraction Successful.\n");
+                Print_list_element(headR);
+            }
+            break;
+        case 'x':
+            /* call the function to perform the multiplication operation */
 
-    Dlist *head1 = NULL, *tail1 = NULL;
-    Dlist *head2 = NULL, *tail2 = NULL;
-    Dlist *res_head = NULL, *res_tail = NULL;
+            if ((multiplication(&head1, &tail1, &head2, &tail2, &headR, &tailR)) == FAILURE)
+            {
+                printf("multiplication operation fail\n");
+            }
+            else
+            {
+                printf("multiplication Successful.\n");
+                Print_list_element(headR);
+            }
+            break;
+        case '/':
+            // call the function to perform the division operation
+            if ((division(&head1, &tail1, &head2, &tail2, &headR, &tailR)) == FAILURE)
+            {
+                printf("Division operation fail\n");
+            }
+            else
+            {
+                printf("Division Successful.\n");
+                Print_list_element(headR);
+            }
+            break;
+        default:
+            printf("Invalid Input:-( Try again...\n");
+            break;
+        }
+        Delete_list(&head1, &tail1);
+        Delete_list(&head2, &tail2);
+        Delete_list(&headR, &tailR);
+        printf("Want to continue? Press [yY | nN]: \n");
+        scanf(" %c", &option);
+        if (option == 'n' || option == 'N')
+        {
+            return 0;
+        }
+        printf("Witch Opretion you wont to execute. ( '+ ' '-' 'x' '/' )\n");
+        scanf(" %c", &ch);
+        argv[2][0] = ch;
+    } while (option == 'y' || option == 'Y');
 
-    for (i = 0; argv[1][i] != '\0'; i++)
-    {
-        int digit = argv[1][i] - '0';
-        insert_at_end(&head1, &tail1, digit);
-    }
-
-    for (i = 0; argv[3][i] != '\0'; i++)
-    {
-        int digit = argv[3][i] - '0';
-        insert_at_end(&head2, &tail2, digit);
-    }
-
-    int is_negative = 0;
-
-    switch (argv[2][0])
-    {
-    case '+':
-        add(&head1, &tail1, &head2, &tail2, &res_head, &res_tail);
-        break;
-
-    case '-':
-        is_negative = compare(&head1, &head2);
-        sub(&head1, &tail1, &head2, &tail2, &res_head, &res_tail);
-        break;
-    }
-
-    printf("Result: ");
-    if (is_negative)
-    {
-        printf("-");
-    }
-    print_list(res_head);
-    printf("\n");
-
-    free_list(&head1, &tail1);
-    free_list(&head2, &tail2);
-    free_list(&res_head, &res_tail);
-
-    return SUCCESS;
+    return 0;
 }
