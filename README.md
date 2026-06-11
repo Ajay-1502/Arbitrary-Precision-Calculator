@@ -1,4 +1,4 @@
-***** Arbitrary Precision Calculator *****
+# Arbitrary Precision Calculator #
 
           -> This project is an Arbitrary Precision Calculator designed to perform mathematical operations on numbers of virtually
                  unlimited size.
